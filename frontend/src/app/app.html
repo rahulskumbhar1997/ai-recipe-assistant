@@ -1,0 +1,83 @@
+<main class="app-shell">
+  <section class="overlay-card">
+    <h1>{{ title() }}</h1>
+    <p class="subtitle">Upload food image, send analyse request, and chat below.</p>
+
+    <div class="upload-area">
+      <label for="imageUpload">Upload recipe image</label>
+      <input id="imageUpload" type="file" accept="image/*" (change)="onImageSelected($event)" />
+
+      @if (isCameraSupported()) {
+        <div class="camera-actions">
+          <button type="button" class="secondary-btn" [disabled]="isCameraActive()" (click)="startCamera()">
+            Start Camera
+          </button>
+          <button type="button" class="secondary-btn" [disabled]="!isCameraActive()" (click)="capturePicture()">
+            Capture Picture
+          </button>
+          <button
+            type="button"
+            class="secondary-btn"
+            [disabled]="isCameraActive() || !capturedImagePreview()"
+            (click)="recapturePicture()"
+          >
+            Recapture
+          </button>
+        </div>
+
+        <div class="camera-preview" [class.hidden]="!isCameraActive() && !capturedImagePreview()">
+          <video #cameraVideo autoplay playsinline muted [class.hidden]="!isCameraActive()"></video>
+          <img
+            [src]="capturedImagePreview() || ''"
+            alt="Captured recipe"
+            [class.hidden]="isCameraActive() || !capturedImagePreview()"
+          />
+        </div>
+
+        @if (cameraStatus()) {
+          <p class="meta">{{ cameraStatus() }}</p>
+        }
+      } @else {
+        <p class="meta">Camera capture is not available on this device/browser.</p>
+      }
+
+      <p class="meta">Selected: {{ selectedImageName() }}</p>
+      <button type="button" [disabled]="isUploading()" (click)="analyseRecipeImage()">
+        {{ isUploading() ? 'Asking...' : 'Ask AI Chef' }}
+      </button>
+      <div class="status" role="status" aria-live="polite" [innerHTML]="analyseStatus()"></div>
+    </div>
+
+    <section class="chat-box">
+      <h2>Chat</h2>
+      <div class="messages">
+        @for (message of chatMessages(); track $index) {
+          <div class="message-row" [class.user]="message.role === 'user'">
+            <div class="message-bubble" [class.user]="message.role === 'user'">
+              @if (message.role === 'assistant') {
+                <div [innerHTML]="message.content"></div>
+              } @else {
+                <span>{{ message.content }}</span>
+              }
+            </div>
+          </div>
+        }
+        @if (isChatLoading()) {
+          <div class="message-row">
+            <div class="message-bubble typing">AI Chef is typing...</div>
+          </div>
+        }
+      </div>
+      <div class="composer">
+        <input
+          type="text"
+          [(ngModel)]="chatInput"
+          placeholder="Type your message"
+          [disabled]="isChatLoading()"
+          (keydown.enter)="sendMessage()"
+        />
+        <button type="button" [disabled]="isChatLoading()" (click)="sendMessage()">Send</button>
+      </div>
+    </section>
+  </section>
+</main>
