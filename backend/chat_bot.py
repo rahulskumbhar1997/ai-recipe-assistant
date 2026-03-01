@@ -2,13 +2,15 @@ from langchain.agents import create_agent
 from langchain.messages import HumanMessage
 from openai import RateLimitError
 from exceptions import APIRateLimitException
+from langchain_aws import ChatBedrock
 
 
 class ChatBot:
 
     def __init__(self):
+        aws_llm = ChatBedrock(model="apac.amazon.nova-micro-v1:0", region="ap-south-1")
         system_prompt = "You are a helpful Chef assistant. Answer the user's questions to the best of your ability. I will be printing the answer in HTML page so include proper formatting in the response as well. Also answer only questions related to cooking, recipes, food and restaurants. If the question is not related to these topics then answer with 'Sorry, I can only answer questions related to cooking, recipes, food and restaurants.'"
-        self.agent = create_agent('gpt-5-nano', system_prompt=system_prompt)
+        self.agent = create_agent(aws_llm, system_prompt=system_prompt)
 
     def chat(self, user_message: str) -> str:
         try:

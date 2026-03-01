@@ -171,7 +171,7 @@ Rate limit (`429`): same shape as above.
 
 - Current CORS setup allows local origins (`localhost` / `127.0.0.1`).
 - Frontend displays assistant HTML content via `innerHTML`; only trusted backend output should be rendered.
-- Model configured in backend is `gpt-5-nano`.
+- Model configured in backend is `gpt-5-mini`.
 
 ## Troubleshooting
 

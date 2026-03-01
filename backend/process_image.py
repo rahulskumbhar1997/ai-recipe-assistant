@@ -4,14 +4,16 @@ from langchain.messages import HumanMessage
 from openai import RateLimitError
 from web_search import web_search
 from exceptions import APIRateLimitException
+from langchain_aws import ChatBedrock
 
 
 class ProcessImage:
     def __init__(self, image):
         self.image = image
+        aws_llm = ChatBedrock(model="apac.amazon.nova-lite-v1:0", region="ap-south-1")
         system_prompt = "Use your tools only and answer the questions. Don't use your knowledge base to answer. Answer should be one liner"
-        self.recipe_agent = create_agent('gpt-5-nano', tools=[web_search], system_prompt=system_prompt)
-        self.agent = create_agent('gpt-5-nano')
+        self.recipe_agent = create_agent(aws_llm, tools=[web_search], system_prompt=system_prompt)
+        self.agent = create_agent(aws_llm)
 
     @staticmethod
     def _raise_rate_limit_exception(error: RateLimitError, source: str) -> None:

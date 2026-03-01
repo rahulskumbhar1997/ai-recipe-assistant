@@ -1,7 +1,7 @@
 export const backendConfig = {
   protocol: 'http',
   hostname: 'localhost',
-  port: 80,
+  port: 8080,
 };
 
 export const backendBaseUrl = `${backendConfig.protocol}://${backendConfig.hostname}:${backendConfig.port}`;
