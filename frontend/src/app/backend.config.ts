@@ -1,6 +1,6 @@
 export const backendConfig = {
   protocol: 'http',
-  hostname: 'localhost',
+  hostname: '13.205.4.84',
   port: 8080,
 };
 
