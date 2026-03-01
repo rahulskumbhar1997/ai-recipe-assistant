@@ -14,8 +14,7 @@ CORS(
     resources={
         r"/*": {
             "origins": [
-                r"^https?://localhost(:\d+)?$",
-                r"^https?://127\.0\.0\.1(:\d+)?$",
+                r"^https?://ai-recipe\.cloudrockers\.in(:\d+)?$"
             ]
         }
     },
