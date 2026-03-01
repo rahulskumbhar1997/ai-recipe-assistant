@@ -50,7 +50,7 @@ receipe_app/
 ## Prerequisites
 
 - Python `3.10+`
-- Node.js `20+` and npm
+- Node.js `^20.19.0` or `^22.12.0` (Angular 21 requirement)
 - OpenAI API key
 - Tavily API key
 
@@ -176,6 +176,15 @@ Rate limit (`429`): same shape as above.
 ## Troubleshooting
 
 - **429 Too Many Requests**: wait and retry; verify API quota/limits.
+- **`ERR_REQUIRE_ESM` from Vite**: your Node version is too old for Angular 21 + Vite 7. Use Node `22.12+` (or `20.19+`), then reinstall dependencies:
+
+  ```bash
+  cd frontend
+  nvm use
+  rm -rf node_modules package-lock.json
+  npm install
+  npm start
+  ```
 - **CORS errors**: ensure frontend is running on local host and backend on port `8080`.
 - **API auth errors**: verify `OPENAI_API_KEY` and `TAVILY_API_KEY` are set in the same terminal session where backend is started.
 - **Camera unavailable**: allow browser camera permissions and use HTTPS or localhost.
