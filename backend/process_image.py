@@ -1,4 +1,5 @@
 import base64
+import mimetypes
 from langchain.agents import create_agent
 from langchain.messages import HumanMessage
 from openai import RateLimitError
@@ -8,6 +9,8 @@ from langchain_aws import ChatBedrock
 
 
 class ProcessImage:
+    ALLOWED_MIME_TYPES = {"image/png", "image/jpeg"}
+
     def __init__(self, image):
         self.image = image
         aws_llm = ChatBedrock(model="apac.amazon.nova-lite-v1:0", region="ap-south-1")
@@ -39,12 +42,25 @@ class ProcessImage:
         img_bytes = self.image.getvalue()
         img_b64 = base64.encodebytes(img_bytes).decode('utf-8')
         return img_b64
+
+    def _get_image_mime_type(self) -> str:
+        mime_type = getattr(self.image, "mimetype", None) or getattr(self.image, "content_type", None)
+        if not mime_type:
+            filename = getattr(self.image, "filename", "") or ""
+            guessed_type, _ = mimetypes.guess_type(filename)
+            mime_type = guessed_type
+
+        if mime_type == "image/jpg":
+            mime_type = "image/jpeg"
+
+        return mime_type if mime_type in self.ALLOWED_MIME_TYPES else "image/png"
     
     def _get_image_contents(self) -> str:
         img_b64 = self._get_img_base64()
+        mime_type = self._get_image_mime_type()
         multi_model_question = HumanMessage([
             {"type": "text", "text": "List all items shown in the image. Answer in one liner. If the items are not food items then return a message saying 'No food items found in the image'"},
-            {"type": "image", "base64": img_b64, "mime_type": "image/png"}
+            {"type": "image", "base64": img_b64, "mime_type": mime_type}
         ])
         try:
             response = self.agent.invoke({
