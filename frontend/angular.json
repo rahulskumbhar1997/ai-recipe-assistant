@@ -52,6 +52,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": ["ai-recipe.cloudrockers.in"]
+          },
           "configurations": {
             "production": {
               "buildTarget": "ai-receipe-assistant:build:production"
