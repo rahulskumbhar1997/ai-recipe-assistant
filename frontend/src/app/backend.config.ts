@@ -1,6 +1,6 @@
 export const backendConfig = {
-  protocol: 'http',
-  hostname: '13.205.4.84',
+  protocol: 'https',
+  hostname: '13.205.4.84ai-recipe.cloudrockers.in',
   port: 8080,
 };
 
