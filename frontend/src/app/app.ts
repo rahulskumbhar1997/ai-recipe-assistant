@@ -19,6 +19,7 @@ type ChatMessage = {
 export class App {
   private readonly uploadEndpoint = `${backendBaseUrl}/upload-image`;
   private readonly chatEndpoint = `${backendBaseUrl}/chat`;
+  private readonly clientId = this.getOrCreateClientId();
   private selectedImageFile: File | null = null;
   private cameraStream: MediaStream | null = null;
   private capturedImageObjectUrl: string | null = null;
@@ -203,7 +204,10 @@ export class App {
     this.chatInput = '';
     this.isChatLoading.set(true);
 
-    this.http.post<{ message: string }>(this.chatEndpoint, { message }).subscribe({
+    this.http.post<{ message: string }>(this.chatEndpoint, {
+      message,
+      client_id: this.clientId,
+    }).subscribe({
       next: (response) => {
         this.chatMessages.update((messages) => [
           ...messages,
@@ -258,5 +262,30 @@ export class App {
     }
 
     return normalized.replaceAll('\n', '<br/>');
+  }
+
+  private getOrCreateClientId(): string {
+    const storageKey = 'recipe_assistant_client_id';
+
+    if (typeof window === 'undefined' || !window.localStorage) {
+      return this.generateClientId();
+    }
+
+    const existingId = window.localStorage.getItem(storageKey);
+    if (existingId) {
+      return existingId;
+    }
+
+    const clientId = this.generateClientId();
+    window.localStorage.setItem(storageKey, clientId);
+    return clientId;
+  }
+
+  private generateClientId(): string {
+    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+      return crypto.randomUUID();
+    }
+
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
   }
 }

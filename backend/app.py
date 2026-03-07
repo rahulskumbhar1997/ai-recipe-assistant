@@ -58,14 +58,16 @@ def upload_image():
 def chat():
     data = request.get_json(silent=True) or {}
     user_message = data.get("message", "")
+    user_id = data.get("client_id", "")
     if not user_message:
         return jsonify({"error": "validation_error", "message": "'message' is required."}), 400
 
     # Here you would typically process the user_message and generate a response
-    chat_bot = ChatBot()
-    response_message = chat_bot.chat(user_message)
+    
+    response_message = chat_bot.chat(user_message, user_id)
     return jsonify({"message": response_message})
 
 
 if __name__ == '__main__':
+    chat_bot = ChatBot()
     app.run(host='0.0.0.0', port=8080, debug=True)

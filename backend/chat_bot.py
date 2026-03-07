@@ -3,20 +3,23 @@ from langchain.messages import HumanMessage
 from openai import RateLimitError
 from exceptions import APIRateLimitException
 from langchain_aws import ChatBedrock
-
+from langgraph.checkpoint.memory import MemorySaver
 
 class ChatBot:
 
     def __init__(self):
+        checkpointer = MemorySaver()
         aws_llm = ChatBedrock(model="apac.amazon.nova-micro-v1:0", region="ap-south-1")
         system_prompt = "You are a helpful Chef assistant. Answer the user's questions to the best of your ability. I will be printing the answer in HTML page so include proper formatting in the response as well. Also answer only questions related to cooking, recipes, food and restaurants. If the question is not related to these topics then answer with 'Sorry, I can only answer questions related to cooking, recipes, food and restaurants.'"
-        self.agent = create_agent(aws_llm, system_prompt=system_prompt)
+        self.agent = create_agent(aws_llm, system_prompt=system_prompt, checkpointer=checkpointer)
 
-    def chat(self, user_message: str) -> str:
+    def chat(self, user_message: str, user_id: str) -> str:
         try:
+            config = {"configurable": {"thread_id": user_id}}
             response = self.agent.invoke({
                 "messages": [HumanMessage(content=user_message)]
-            })
+            },
+            config=config)
         except RateLimitError as error:
             response_obj = getattr(error, "response", None)
             headers = getattr(response_obj, "headers", {}) or {}
